@@ -1,0 +1,263 @@
+I'll provide you with all the necessary React.js code files to create the To-Do app as shown in the image. The app will include:
+
+A main dashboard to view tasks
+A modal or form to add new tasks
+Task filtering (All, To-do, Completed)
+I'll structure it using React functional components and hooks. Here are the files I'll provide:
+
+App.js – Main entry point
+TodoList.js – Displays tasks
+TodoForm.js – Form to add tasks
+TodoItem.js – Individual task item
+styles.css – Styling
+Let's start with these files!
+
+Failed to generate
+I'll provide you with all the necessary React.js code files to create the to-do app as shown in the image. The app will include:
+
+A main page displaying tasks with filters (All, To-do, Completed)
+A modal or form for adding new tasks
+Task details including name, description, category, date, priority, and fulfillment progress
+Project Structure:
+bash
+Copy
+Edit
+/todo-app
+  ├── /public
+  │   ├── index.html
+  ├── /src
+  │   ├── /components
+  │   │   ├── TodoList.js
+  │   │   ├── TodoItem.js
+  │   │   ├── AddTodoForm.js
+  │   ├── App.js
+  │   ├── index.js
+  │   ├── styles.css
+  ├── package.json
+  ├── README.md
+1. package.json (Dependencies)
+Ensure you have the required dependencies installed.
+
+json
+Copy
+Edit
+{
+  "name": "todo-app",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-scripts": "latest"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  }
+}
+Run:
+
+sh
+Copy
+Edit
+npx create-react-app todo-app
+cd todo-app
+npm install
+2. src/index.js
+jsx
+Copy
+Edit
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+import "./styles.css";
+
+ReactDOM.render(<App />, document.getElementById("root"));
+3. src/App.js
+jsx
+Copy
+Edit
+import React, { useState } from "react";
+import TodoList from "./components/TodoList";
+import AddTodoForm from "./components/AddTodoForm";
+
+function App() {
+  const [todos, setTodos] = useState([
+    { id: 1, task: "Learn React", description: "Managing State, Effects", category: "Programming", date: "", priority: "High", fulfillment: 30 },
+    { id: 2, task: "Shopping", description: "Potatoes, Onions, Eggs", category: "Household", date: "26.02.2023", priority: "High", fulfillment: 0 },
+    { id: 3, task: "Buy tickets", description: "at cheaptickets.com/shanghai", category: "Travel", date: "12.01.2023 12:00", priority: "Medium", fulfillment: 100 }
+  ]);
+
+  const [showForm, setShowForm] = useState(false);
+
+  const addTodo = (newTodo) => {
+    setTodos([...todos, { id: Date.now(), ...newTodo }]);
+    setShowForm(false);
+  };
+
+  return (
+    <div className="container">
+      <h1>React To-Do List</h1>
+      <button onClick={() => setShowForm(true)}>Add a new to-do</button>
+      {showForm && <AddTodoForm onSave={addTodo} onCancel={() => setShowForm(false)} />}
+      <TodoList todos={todos} />
+    </div>
+  );
+}
+
+export default App;
+4. src/components/TodoList.js
+jsx
+Copy
+Edit
+import React, { useState } from "react";
+import TodoItem from "./TodoItem";
+
+function TodoList({ todos }) {
+  const [filter, setFilter] = useState("All");
+
+  const filteredTodos = todos.filter(todo => {
+    if (filter === "All") return true;
+    if (filter === "To-do") return todo.fulfillment < 100;
+    if (filter === "Completed") return todo.fulfillment === 100;
+    return true;
+  });
+
+  return (
+    <div>
+      <div className="filter-buttons">
+        <button onClick={() => setFilter("All")}>All</button>
+        <button onClick={() => setFilter("To-do")}>To-do</button>
+        <button onClick={() => setFilter("Completed")}>Completed</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>When</th>
+            <th>Priority</th>
+            <th>Fulfillment</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredTodos.map(todo => (
+            <TodoItem key={todo.id} todo={todo} />
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export default TodoList;
+5. src/components/TodoItem.js
+jsx
+Copy
+Edit
+import React from "react";
+
+function TodoItem({ todo }) {
+  return (
+    <tr>
+      <td>{todo.task}</td>
+      <td>{todo.description}</td>
+      <td>{todo.category}</td>
+      <td>{todo.date}</td>
+      <td>{todo.priority}</td>
+      <td>{todo.fulfillment}%</td>
+    </tr>
+  );
+}
+
+export default TodoItem;
+6. src/components/AddTodoForm.js
+jsx
+Copy
+Edit
+import React, { useState } from "react";
+
+function AddTodoForm({ onSave, onCancel }) {
+  const [task, setTask] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [date, setDate] = useState("");
+  const [priority, setPriority] = useState("Low");
+  const [fulfillment, setFulfillment] = useState(0);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave({ task, description, category, date, priority, fulfillment });
+  };
+
+  return (
+    <div className="form-container">
+      <h2>Add a new to-do:</h2>
+      <form onSubmit={handleSubmit}>
+        <input type="text" placeholder="Name" value={task} onChange={(e) => setTask(e.target.value)} required />
+        <input type="text" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+        <input type="text" placeholder="Category" value={category} onChange={(e) => setCategory(e.target.value)} />
+        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+        <input type="range" min="0" max="100" value={fulfillment} onChange={(e) => setFulfillment(e.target.value)} />
+        <button type="submit">Save</button>
+        <button type="button" onClick={onCancel}>Cancel</button>
+      </form>
+    </div>
+  );
+}
+
+export default AddTodoForm;
+7. src/styles.css
+css
+Copy
+Edit
+body {
+  background: linear-gradient(135deg, #4c6ef5, #99a8f5);
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.container {
+  margin: auto;
+  width: 50%;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  color: black;
+}
+
+button {
+  background: #4c6ef5;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 8px;
+  border-bottom: 1px solid gray;
+}
+Run the App:
+sh
+Copy
+Edit
+npm start
+This will launch the To-Do List app in your browser.
+
+Let me know if you need modifications! 🚀
