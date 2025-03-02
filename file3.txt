@@ -1,0 +1,273 @@
+I'll provide you with a React.js to-do app that matches the UI shown in the images. This app will include:
+
+Main App Component (App.js) - Manages the overall state and displays tasks.
+To-Do List Component (ToDoList.js) - Displays the list of tasks.
+Add Task Component (AddTask.js) - Provides a form for adding new tasks.
+Task Item Component (TaskItem.js) - Displays individual tasks.
+Styles (styles.css) - Ensures the UI matches the given image.
+1. Install React and Required Packages
+Run the following command in your terminal to set up a new React project:
+
+sh
+Copy
+Edit
+npx create-react-app todo-app
+cd todo-app
+npm install
+Replace the files inside the src/ folder with the following:
+
+2. src/App.js
+jsx
+Copy
+Edit
+import React, { useState } from "react";
+import ToDoList from "./ToDoList";
+import AddTask from "./AddTask";
+import "./styles.css";
+
+function App() {
+  const [tasks, setTasks] = useState([]);
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [filter, setFilter] = useState("all");
+
+  const addTask = (task) => {
+    setTasks([...tasks, { ...task, id: Date.now() }]);
+    setShowAddTask(false);
+  };
+
+  const filteredTasks = tasks.filter((task) => {
+    if (filter === "all") return true;
+    if (filter === "todo") return task.fulfillment < 100;
+    if (filter === "completed") return task.fulfillment === 100;
+    return true;
+  });
+
+  return (
+    <div className="app">
+      <h1>React To-Do List</h1>
+      <button onClick={() => setShowAddTask(true)}>Add a new to-do</button>
+
+      <div className="filter-buttons">
+        <button onClick={() => setFilter("all")}>All</button>
+        <button onClick={() => setFilter("todo")}>To-do</button>
+        <button onClick={() => setFilter("completed")}>Completed</button>
+      </div>
+
+      {showAddTask ? (
+        <AddTask onSave={addTask} onCancel={() => setShowAddTask(false)} />
+      ) : (
+        <ToDoList tasks={filteredTasks} />
+      )}
+    </div>
+  );
+}
+
+export default App;
+3. src/ToDoList.js
+jsx
+Copy
+Edit
+import React from "react";
+import TaskItem from "./TaskItem";
+
+function ToDoList({ tasks }) {
+  return (
+    <div className="todo-list">
+      <table>
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>When</th>
+            <th>Priority</th>
+            <th>Fulfillment</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tasks.map((task) => (
+            <TaskItem key={task.id} task={task} />
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export default ToDoList;
+4. src/AddTask.js
+jsx
+Copy
+Edit
+import React, { useState } from "react";
+
+function AddTask({ onSave, onCancel }) {
+  const [task, setTask] = useState({
+    name: "",
+    description: "",
+    category: "",
+    date: "",
+    time: "",
+    priority: "Medium",
+    fulfillment: 0,
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setTask({ ...task, [name]: value });
+  };
+
+  return (
+    <div className="add-task">
+      <h2>Add a new to-do:</h2>
+      <input
+        type="text"
+        name="name"
+        placeholder="Task name"
+        value={task.name}
+        onChange={handleChange}
+      />
+      <input
+        type="text"
+        name="description"
+        placeholder="Description"
+        value={task.description}
+        onChange={handleChange}
+      />
+      <input
+        type="text"
+        name="category"
+        placeholder="Category"
+        value={task.category}
+        onChange={handleChange}
+      />
+      <input
+        type="date"
+        name="date"
+        value={task.date}
+        onChange={handleChange}
+      />
+      <input
+        type="time"
+        name="time"
+        value={task.time}
+        onChange={handleChange}
+      />
+      <select name="priority" value={task.priority} onChange={handleChange}>
+        <option>Low</option>
+        <option>Medium</option>
+        <option>High</option>
+      </select>
+      <input
+        type="range"
+        name="fulfillment"
+        min="0"
+        max="100"
+        value={task.fulfillment}
+        onChange={handleChange}
+      />
+
+      <button onClick={() => onSave(task)}>Save</button>
+      <button onClick={onCancel}>Cancel</button>
+    </div>
+  );
+}
+
+export default AddTask;
+5. src/TaskItem.js
+jsx
+Copy
+Edit
+import React from "react";
+
+function TaskItem({ task }) {
+  return (
+    <tr>
+      <td>{task.name}</td>
+      <td>{task.description}</td>
+      <td>{task.category}</td>
+      <td>{task.date} {task.time}</td>
+      <td>{task.priority}</td>
+      <td>{task.fulfillment}%</td>
+    </tr>
+  );
+}
+
+export default TaskItem;
+6. src/styles.css
+css
+Copy
+Edit
+body {
+  background: linear-gradient(to right, #3a7bd5, #3a6073);
+  font-family: Arial, sans-serif;
+  color: white;
+  text-align: center;
+}
+
+.app {
+  background: white;
+  color: black;
+  border-radius: 10px;
+  padding: 20px;
+  width: 60%;
+  margin: 50px auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+button {
+  background-color: #3a7bd5;
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #305c9f;
+}
+
+.add-task {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px auto;
+}
+
+input, select {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.todo-list table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.todo-list th, .todo-list td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+7. src/index.js
+jsx
+Copy
+Edit
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+
+ReactDOM.render(<App />, document.getElementById("root"));
+8. Run the App
+Go to the project folder and start the development server:
+
+sh
+Copy
+Edit
+npm start
+This will launch the To-Do App in your browser.
+
+This React app fully replicates the UI and features shown in the image, including adding tasks, filtering, and a fulfillment slider. 🚀 Let me know if you need modifications!
